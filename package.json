@@ -1,0 +1,30 @@
+{
+  "name": "agrishare",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "mobile",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n mobile,server -c green,blue \"npm --prefix mobile run dev\" \"npm --prefix server run dev\"",
+    "dev:mobile": "npm --prefix mobile run dev",
+    "dev:server": "npm --prefix server run dev",
+    "build": "npm --prefix server run build",
+    "typecheck": "npm --prefix mobile run typecheck && npm --prefix server run typecheck",
+    "lint": "npm --prefix mobile run lint && npm --prefix server run lint",
+    "prisma:generate": "npm --prefix server run prisma:generate",
+    "prisma:migrate:init": "npm --prefix server run prisma:migrate:init",
+    "prisma:migrate:deploy": "npm --prefix server run prisma:migrate:deploy",
+    "db:seed": "npm --prefix server run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "cloudinary": "^2.11.0",
+    "expo-dev-client": "~58.0.18",
+    "expo-location": "~58.0.20",
+    "expo-maps": "~58.0.11"
+  }
+}

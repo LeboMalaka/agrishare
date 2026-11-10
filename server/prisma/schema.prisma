@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  FARMER
+  EQUIPMENT_OWNER
+  OPERATOR
+  ADMIN
+}
+
+enum EquipmentCategory {
+  TRACTORS
+  PLANTERS
+  AGRICULTURAL_DRONES
+  COLD_STORAGE
+  TRANSPORT_VEHICLES
+  HARVESTING_EQUIPMENT
+  OTHER_MACHINERY
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  LIMITED
+  BOOKED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+enum OperatorCertificationStatus {
+  PENDING
+  CERTIFIED
+  REJECTED
+}
+
+enum OperatorDocumentType {
+  IDENTITY
+  LICENSE
+  CERTIFICATE
+  OTHER
+}
+
+enum OperatorDocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  BOOKING_REQUEST
+  BOOKING_STATUS
+  CERTIFICATION_UPDATE
+  SYSTEM
+}
+
+model User {
+  id              String      @id @default(cuid())
+  name            String
+  email           String      @unique
+  passwordHash    String
+  role            UserRole
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  equipment       Equipment[] @relation("EquipmentOwner")
+  farmerBookings  Booking[]   @relation("BookingFarmer")
+  ownerBookings   Booking[]   @relation("BookingOwner")
+  operatorProfile OperatorProfile?
+  notifications   Notification[]
+
+  @@index([role, createdAt])
+}
+
+model Equipment {
+  id              String          @id @default(cuid())
+  name            String
+  category        EquipmentCategory
+  description     String
+  pricePerDay     Decimal         @db.Decimal(10, 2)
+  location        String
+  latitude        Float?
+  longitude       Float?
+  imageUrl        String?
+  specifications  String[]        @default([])
+  availability    EquipmentStatus @default(AVAILABLE)
+  ownerId         String
+  owner           User            @relation("EquipmentOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  images          EquipmentImage[]
+  availabilityWindows EquipmentAvailability[]
+  bookings        Booking[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([category, availability])
+  @@index([ownerId])
+}
+
+model EquipmentImage {
+  id          String    @id @default(cuid())
+  equipmentId String
+  url         String
+  altText     String?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([equipmentId, sortOrder])
+  @@index([equipmentId])
+}
+
+model EquipmentAvailability {
+  id          String    @id @default(cuid())
+  equipmentId String
+  startsAt    DateTime
+  endsAt      DateTime
+  isAvailable Boolean   @default(false)
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([equipmentId, startsAt, endsAt])
+  @@index([equipmentId, startsAt, endsAt])
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  farmerId      String
+  equipmentId   String
+  ownerId       String
+  requestedDate DateTime
+  notes         String        @default("")
+  status        BookingStatus @default(PENDING)
+  farmer        User          @relation("BookingFarmer", fields: [farmerId], references: [id], onDelete: Restrict)
+  equipment     Equipment     @relation(fields: [equipmentId], references: [id], onDelete: Restrict)
+  owner         User          @relation("BookingOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  notifications Notification[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([farmerId, status])
+  @@index([ownerId, status])
+  @@index([equipmentId, requestedDate])
+}
+
+model OperatorProfile {
+  id                    String                       @id @default(cuid())
+  userId                String                       @unique
+  bio                   String?
+  experienceYears       Int                          @default(0)
+  certificationStatus  OperatorCertificationStatus @default(PENDING)
+  certifiedAt           DateTime?
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents             OperatorDocument[]
+
+  @@index([certificationStatus])
+}
+
+model OperatorDocument {
+  id             String                 @id @default(cuid())
+  profileId      String
+  type           OperatorDocumentType
+  fileUrl        String
+  originalName   String
+  status         OperatorDocumentStatus @default(PENDING)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  profile        OperatorProfile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status])
+  @@index([type])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  bookingId String?
+  type      NotificationType
+  title     String
+  message   String
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking   Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([userId, readAt, createdAt])
+  @@index([bookingId])
+}
