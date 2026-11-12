@@ -2,6 +2,12 @@
 
 AgriShare is a React Native/Expo application with a TypeScript Express API and PostgreSQL database.
 
+## Project documentation
+
+- [API reference](docs/api.md)
+- [System architecture and operations](docs/system.md)
+- [Project tracker and verification status](docs/project-tracker.md)
+
 ## Workspace layout
 
 ```text
