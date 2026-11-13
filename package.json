@@ -19,9 +19,15 @@
     "db:seed": "npm --prefix server run db:seed"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "prisma": "6.19.0"
   },
   "dependencies": {
     "cloudinary": "^2.11.0"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.0": true,
+    "@prisma/engines@6.19.0": true,
+    "prisma@6.19.0": true
   }
 }
