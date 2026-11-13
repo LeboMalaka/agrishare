@@ -122,15 +122,7 @@ app.patch(
   },
 );
 
-app.get('/health', (_request, response) => {
-  response.json({
-    status: 'ok',
-    service: 'agrishare-api',
-    timestamp: new Date().toISOString(),
-  });
-});
-
-app.get('/api/health', (_request, response) => {
+app.get('/', (_request, response) => {
   response.json({
     status: 'ok',
     service: 'agrishare-api',

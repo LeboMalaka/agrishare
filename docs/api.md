@@ -50,8 +50,7 @@ Errors use a JSON object with an `error` message. Common status codes are:
 
 | Method | Path | Access | Response |
 |---|---|---|---|
-| `GET` | `/health` | Public | API status and timestamp |
-| `GET` | `/api/health` | Public | API status and timestamp |
+| `GET` | `/` | Public | API status and timestamp |
 | `GET` | `/api/health/database` | Public | Database connectivity status |
 
 ## Authentication

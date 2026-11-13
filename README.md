@@ -123,7 +123,7 @@ npm run dev:server
 npm run dev:mobile
 ```
 
-The API listens on `http://localhost:4000`; health checks are available at `/health`, `/api/health`, and `/api/health/database`. Expo opens the project menu for web, Android, and iOS targets. You can start one target directly:
+The API listens on `http://localhost:4000`; its status is available at `/`, and the database connectivity check is available at `/api/health/database`. Expo opens the project menu for web, Android, and iOS targets. You can start one target directly:
 
 ```powershell
 npm --prefix mobile run web

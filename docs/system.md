@@ -210,7 +210,7 @@ data as development fixtures.
 - Web map/geocoding keys must be restricted by referrer and allowed APIs.
   Android map keys should be restricted to the app package and signing
   fingerprint.
-- Health endpoints are `/health`, `/api/health`, and
+- The API status endpoint is `/`; the database connectivity check is
   `/api/health/database`.
 
 ## Build and verification
